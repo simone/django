@@ -685,7 +685,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         actor = Actor.objects.create(name="Palin", age=27)
         response = self.client.get("/test_admin/admin/admin_views/actor/?%s" % IS_POPUP_VAR)
-        self.assertContains(response, "opener.dismissRelatedLookupPopup(window, &#39;%s&#39;)" % actor.pk)
+        self.assertContains(response, "parent.dismissRelatedLookupPopup(window, &#39;%s&#39;)" % actor.pk)
 
     def test_hide_change_password(self):
         """

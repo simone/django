@@ -1293,6 +1293,13 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.WARNING)
             return None
 
+    def changelist_redirect_querystring(self, request):
+        return request.session.get(self.changelist_redirect_session_key(request), '')
+
+    def changelist_redirect_session_key(self, request):
+        opts = self.model._meta
+        return 'admin_%s_%s_changelist_querystring' % (opts.app_label, opts.model_name)
+
     def response_delete(self, request, obj_display):
         """
         Determines the HttpResponse for the delete_view stage.
@@ -1477,6 +1484,13 @@ class ModelAdmin(BaseModelAdmin):
             # Add the action checkboxes if there are any actions available.
             list_display = ['action_checkbox'] + list(list_display)
 
+        if '__reload' in request.GET:
+            url = (reverse('admin:%s_%s_changelist' %
+                (opts.app_label, opts.module_name),
+                current_app=self.admin_site.name))
+            url += self.changelist_redirect_querystring(request)
+            return HttpResponseRedirect(url)
+
         ChangeList = self.get_changelist(request)
         try:
             cl = ChangeList(request, self.model, list_display,
@@ -1605,6 +1619,12 @@ class ModelAdmin(BaseModelAdmin):
             preserved_filters=self.get_preserved_filters(request),
         )
         context.update(extra_context or {})
+
+        if request.method == 'GET' and not cl.is_popup:
+            # Store the querystring in the session so we can return to the
+            # same filtered changelist later, for example after an object has
+            # been saved or deleted.
+            request.session[self.changelist_redirect_session_key(request)] = cl.get_query_string()
 
         return TemplateResponse(request, self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.model_name),
