@@ -30,14 +30,28 @@ function windowname_to_id(text) {
 function showAdminPopup(triggeringLink, name_regexp) {
     var name = triggeringLink.id.replace(name_regexp, '');
     name = id_to_windowname(name);
-    var href = triggeringLink.href;
-    if (href.indexOf('?') == -1) {
-        href += '?_popup=1';
+    var href;
+    if (triggeringLink.href.search(/\?/) >= 0) {
+        href = triggeringLink.href + '&_popup=1';
     } else {
-        href  += '&_popup=1';
+        href = triggeringLink.href + '?_popup=1';
     }
-    var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
-    win.focus();
+
+    $dialog = $("<iframe width='100%' class='dialog'/>")
+        .attr("src", href)
+        .attr("name", name)
+        .dialog({
+            title: '',
+            bgiframe    : true,
+            position    : 'center',
+            draggable   : false,
+            resizable   : false,
+            width       : $(window).width() - 30,
+            height      : $(window).height() - 30,
+            stack       : true,
+            autoOpen    : true,
+            modal       : true
+        });
     return false;
 }
 
@@ -45,23 +59,65 @@ function showRelatedObjectLookupPopup(triggeringLink) {
     return showAdminPopup(triggeringLink, /^lookup_/);
 }
 
-function dismissRelatedLookupPopup(win, chosenId) {
+function dismissRelatedLookupPopup(win, chosenId, newRepr) {
+    chosenId = html_unescape(chosenId);
+    newRepr = html_unescape(newRepr);
     var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
-    if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
-        elem.value += ',' + chosenId;
+    var o;
+    if (elem) {
+        var elemName = elem.nodeName.toUpperCase();
+        if (elemName == 'SELECT') {
+            var is_new_option = true;
+            for (i = 0; i < elem.length; ++i){
+                if (elem.options[i].value == chosenId){
+                  elem.options[i].selected = true;
+                  is_new_option = false;
+                  break;
+                }
+            }
+            if (is_new_option){
+                 o = new Option(newRepr, chosenId);
+                elem.options[elem.options.length] = o;
+                o.selected = true;
+            }
+        } else if (elemName == 'INPUT') {
+            if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
+                elem.value += ',' + chosenId;
+            } else {
+                elem.value = newId;
+            }
+        }
+        // Trigger a change event to update related links if required.
+        django.jQuery(elem).trigger('change');
     } else {
-        document.getElementById(name).value = chosenId;
+        $('#'+ name + "_from").val(chosenId);
+        SelectBox.move(name + "_from", name + "_to");
     }
     win.close();
+    $dialog.dialog('close');
 }
 
 function showRelatedObjectPopup(triggeringLink) {
-    var name = triggeringLink.id.replace(/^(change|add|delete)_/, '');
+    var name = triggeringLink.id.replace(/^(change|add|delete|lookup)_/, '');
     name = id_to_windowname(name);
     var href = triggeringLink.href;
-    var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
-    win.focus();
+
+    $dialog = $("<iframe width='100%' class='dialog'/>")
+        .attr("src", href)
+        .attr("name", name)
+        .dialog({
+            title: '',
+            bgiframe    : true,
+            position    : 'center',
+            draggable   : false,
+            resizable   : false,
+            width       : $(window).width() - 30,
+            height      : $(window).height() - 30,
+            stack       : true,
+            autoOpen    : true,
+            modal       : true
+        });
     return false;
 }
 
@@ -95,6 +151,7 @@ function dismissAddRelatedObjectPopup(win, newId, newRepr) {
         SelectBox.redisplay(toId);
     }
     win.close();
+    $dialog.dialog('close');
 }
 
 function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
@@ -110,6 +167,7 @@ function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
         }
     });
     win.close();
+    $dialog.dialog('close');
 };
 
 function dismissDeleteRelatedObjectPopup(win, objId) {
@@ -123,6 +181,7 @@ function dismissDeleteRelatedObjectPopup(win, objId) {
         }
     }).trigger('change');
     win.close();
+    $dialog.dialog('close');
 };
 
 // Kept for backward compatibility

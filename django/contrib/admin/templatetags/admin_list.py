@@ -253,15 +253,15 @@ def items_for_result(cl, result, form):
                     '<a href="{}"{}>{}</a>',
                     url,
                     format_html(
-                        ' onclick="opener.dismissRelatedLookupPopup(window, '
-                        '&#39;{}&#39;); return false;"', result_id
+                        ' onclick="parent.dismissRelatedLookupPopup(window, '
+                        '&#39;{0}&#39;, &#39;{1}&#39;); return false;"', result_id, result_repr
                     ) if cl.is_popup else '',
                     result_repr)
 
             yield format_html('<{}{}>{}</{}>',
                               table_tag,
                               row_class,
-                              link_or_text,
+                              link_or_text,                              
                               table_tag)
         else:
             # By default the fields come from ModelAdmin.list_editable, but if we pull

@@ -10,6 +10,14 @@
                 alt="{% trans 'Change' %}"/>
         </a>
         {% endif %}
+        {% if can_lookup_related %}
+        <a class="related-widget-wrapper-link related-lookup" id="lookup_id_{{ name }}"
+            href="{{ changelist_related_template_url }}?{{ url_params }}"
+            title="{% blocktrans %}Lookup selected {{ model }}{% endblocktrans %}">
+            <img src="{% static 'admin/img/selector-search.gif' %}" width="10" height="10"
+                alt="{% trans 'Lookup' %}"/>
+        </a>
+        {% endif %}
         {% if can_add_related %}
         <a class="related-widget-wrapper-link add-related" id="add_id_{{ name }}"
             href="{{ add_related_url }}?{{ url_params }}"

@@ -300,6 +300,17 @@ class RelatedFieldWidgetWrapper(forms.Widget):
                 can_change_related=True,
                 change_related_template_url=change_related_template_url,
             )
+
+        if self.can_add_related or self.can_change_related or self.can_delete_related:
+            changelist_related_template_url = reverse(
+                    'admin:%s_%s_changelist' % info,
+                    current_app=self.admin_site.name,
+            )
+            context.update(
+                can_lookup_related=True,
+                changelist_related_template_url=changelist_related_template_url
+            )
+
         if self.can_add_related:
             add_related_url = self.get_related_url(info, 'add')
             context.update(
