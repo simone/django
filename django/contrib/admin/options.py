@@ -971,6 +971,13 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg)
             return None
 
+    def changelist_redirect_querystring(self, request):
+        return request.session.get(self.changelist_redirect_session_key(request), '')
+
+    def changelist_redirect_session_key(self, request):
+        opts = self.model._meta
+        return 'admin_%s_%s_changelist_querystring' % (opts.app_label, opts.module_name)
+
     @csrf_protect_m
     @transaction.commit_on_success
     def add_view(self, request, form_url='', extra_context=None):
@@ -1171,6 +1178,13 @@ class ModelAdmin(BaseModelAdmin):
             # Add the action checkboxes if there are any actions available.
             list_display = ['action_checkbox'] +  list(list_display)
 
+        if '__reload' in request.GET:
+            url = (reverse('admin:%s_%s_changelist' %
+                (opts.app_label, opts.module_name),
+                current_app=self.admin_site.name))
+            url += self.changelist_redirect_querystring(request)
+            return HttpResponseRedirect(url)
+
         ChangeList = self.get_changelist(request)
         try:
             cl = ChangeList(request, self.model, list_display,
@@ -1297,6 +1311,12 @@ class ModelAdmin(BaseModelAdmin):
         }
         context.update(extra_context or {})
 
+        if request.method == 'GET' and not cl.is_popup:
+            # Store the querystring in the session so we can return to the
+            # same filtered changelist later, for example after an object has
+            # been saved or deleted.
+            request.session[self.changelist_redirect_session_key(request)] = cl.get_query_string()
+
         return TemplateResponse(request, self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
             'admin/%s/change_list.html' % app_label,
@@ -1337,9 +1357,11 @@ class ModelAdmin(BaseModelAdmin):
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect(reverse('admin:index',
                                                     current_app=self.admin_site.name))
-            return HttpResponseRedirect(reverse('admin:%s_%s_changelist' %
+            url = (reverse('admin:%s_%s_changelist' %
                                         (opts.app_label, opts.module_name),
                                         current_app=self.admin_site.name))
+            url += self.changelist_redirect_querystring(request)
+            return HttpResponseRedirect(url)
 
         object_name = force_text(opts.verbose_name)
 
