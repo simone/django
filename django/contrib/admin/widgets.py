@@ -261,6 +261,17 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         info = (rel_to._meta.app_label, rel_to._meta.object_name.lower())
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
+
+        try:
+            related_url = reverse('admin:%s_%s_changelist' % info, current_app=self.admin_site.name)
+            output.append(u'<a href="%s?t=id" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
+                          % (related_url, name))
+            output.append(u'<img src="%s" width="16" height="16" alt="%s"/></a>'
+                          % (static('admin/img/selector-search.gif'), _('Lookup')))
+        except:
+            # no managed by admin
+            pass
+
         if self.can_add_related:
             related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
             # TODO: "add_id_" is hard-coded here. This should instead use the

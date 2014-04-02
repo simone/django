@@ -828,8 +828,8 @@ class ModelAdmin(BaseModelAdmin):
         if "_popup" in request.POST:
             return HttpResponse(
                 '<!DOCTYPE html><html><head><title></title></head><body>'
-                '<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script></body></html>' % \
-                # escape() calls force_text.
+            '<script type="text/javascript">parent.dismissAddAnotherPopup(window, "%s", "%s");</script></body></html>' %\
+                # escape() calls force_unicode.
                 (escape(pk_value), escapejs(obj)))
         elif "_addanother" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may add another %(name)s below.') % msg_dict
