@@ -231,7 +231,7 @@ def items_for_result(cl, result, form):
                               table_tag,
                               row_class,
                               url,
-                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
+                              format_html(' onclick="parent.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
                                 if cl.is_popup else '',
                               result_repr,
                               table_tag)
