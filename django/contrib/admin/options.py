@@ -781,7 +781,7 @@ class ModelAdmin(BaseModelAdmin):
         if "_popup" in request.POST:
             return HttpResponse(
                 '<!DOCTYPE html><html><head><title></title></head><body>'
-                '<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script></body></html>' % \
+            '<script type="text/javascript">parent.dismissAddAnotherPopup(window, "%s", "%s");</script></body></html>' %\
                 # escape() calls force_unicode.
                 (escape(pk_value), escapejs(obj)))
         elif "_addanother" in request.POST:
@@ -797,7 +797,6 @@ class ModelAdmin(BaseModelAdmin):
                 post_url = reverse('admin:%s_%s_changelist' %
                                    (opts.app_label, opts.module_name),
                                    current_app=self.admin_site.name)
-                post_url += self.changelist_redirect_querystring(request)
             else:
                 post_url = reverse('admin:index',
                                    current_app=self.admin_site.name)
