@@ -286,8 +286,6 @@ iendswith
 ies
 iexact
 ifchanged
-ifequal
-ifnotequal
 iframe
 inbox
 Incompliance
@@ -492,6 +490,7 @@ proxied
 proxying
 pseudocode
 psycopg
+Punycode
 Puthraya
 py
 pyformat
@@ -630,6 +629,9 @@ subselect
 substr
 subtemplate
 subtemplates
+subtransactions
+subtree
+subtype
 subviews
 subwidgets
 symlink
@@ -693,6 +695,7 @@ unescaped
 ungrouped
 unhandled
 unharmful
+unhashable
 unicode
 uninstall
 uninstalling

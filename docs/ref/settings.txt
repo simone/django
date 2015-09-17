@@ -101,7 +101,7 @@ middleware; if so this middleware must be listed first in
     In Django 1.7, the trailing dot is stripped when performing host validation,
     thus an entry with a trailing dot isn't required.
 
-.. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
+.. _`fully qualified domain name (FQDN)`: https://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
@@ -388,7 +388,8 @@ CSRF_COOKIE_NAME
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be
-whatever you want. See :doc:`/ref/csrf`.
+whatever you want (as long as it's different from the other cookie names in
+your application). See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
@@ -482,8 +483,8 @@ ATOMIC_REQUESTS
 
 Default: ``False``
 
-Set this to ``True`` to wrap each HTTP request in a transaction on this
-database. See :ref:`tying-transactions-to-http-requests`.
+Set this to ``True`` to wrap each view in a transaction on this database. See
+:ref:`tying-transactions-to-http-requests`.
 
 .. setting:: DATABASE-AUTOCOMMIT
 
@@ -622,8 +623,22 @@ TEST
 Default: ``{}``
 
 A dictionary of settings for test databases; for more details about the
-creation and use of test databases, see :ref:`the-test-database`. The
-following entries are available:
+creation and use of test databases, see :ref:`the-test-database`.
+
+Here's an example with a test database configuration::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'USER': 'mydatabaseuser',
+            'NAME': 'mydatabase',
+            'TEST': {
+                'NAME': 'mytestdatabase',
+            },
+        },
+    }
+
+The following keys in the ``TEST`` dictionary are available:
 
 .. setting:: TEST_CHARSET
 
@@ -1718,8 +1733,8 @@ LANGUAGE_COOKIE_NAME
 Default: ``'django_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever
-you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
-:doc:`/topics/i18n/index`.
+you want (as long as it's different from the other cookie names in your
+application). See :doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGE_COOKIE_PATH
 
@@ -2407,7 +2422,10 @@ OPTIONS
 Default: ``{}`` (Empty dict)
 
 Extra parameters to pass to the template backend. Available parameters vary
-depending on the template backend.
+depending on the template backend. See
+:class:`~django.template.backends.django.DjangoTemplates` and
+:class:`~django.template.backends.jinja2.Jinja2` for the options of the
+built-in backends.
 
 .. setting:: TEMPLATE_CONTEXT_PROCESSORS
 
@@ -2649,7 +2667,7 @@ to ensure your processes are running in the correct environment.
     If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
-.. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+.. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 .. _pytz: http://pytz.sourceforge.net/
 
@@ -3061,8 +3079,8 @@ SESSION_COOKIE_NAME
 
 Default: ``'sessionid'``
 
-The name of the cookie to use for sessions. This can be whatever you want (but
-should be different from :setting:`LANGUAGE_COOKIE_NAME`).
+The name of the cookie to use for sessions. This can be whatever you want
+(as long as it's different from the other cookie names in your application).
 
 .. setting:: SESSION_COOKIE_PATH
 
